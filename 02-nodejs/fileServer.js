@@ -21,5 +21,31 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 
+//To get list of the files present in the directroy 
+app.get('/files', (req, res) => {
+  fs.readdir(path.join(__dirname, './files/'), (err, files) => {  //fs.readdir is for geting the list of files present in the dir
+    if (err) {
+      return res.status(500).json({ error: 'Failed to retrieve files' });
+    }
+    res.json(files);
+  });
+});
+
+
+// To get the content of the file the file name will be geting from params.
+app.get('/file/:filename', (req, res) => {
+  const filepath = path.join(__dirname, './files/', req.params.filename);
+
+  fs.readFile(filepath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(404).send('File not found');
+    }
+    res.send(data);
+  });
+});
+
+app.all('*', (req, res) => {
+  res.status(404).send('Route not found');
+});
 
 module.exports = app;
